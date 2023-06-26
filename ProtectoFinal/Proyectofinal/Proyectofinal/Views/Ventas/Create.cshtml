@@ -1,0 +1,100 @@
+﻿@model Proyectofinal.Models.Venta
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Ventas</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="IdProducto" class="control-label"></label>
+                <select asp-for="IdProducto" class="form-control" asp-items="ViewBag.IdProducto"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="VentaRapida" class="control-label"></label>
+                <input asp-for="VentaRapida" class="form-control" />
+                <span asp-validation-for="VentaRapida" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="IdUsuario" class="control-label"></label>
+                <select asp-for="IdUsuario" class="form-control" asp-items="ViewBag.IdUsuario"></select>
+            </div>
+               <div class="form-group">
+                    <label asp-for="Iva" class="control-label" ></label>
+                    <input asp-for="Iva" class="form-control"  readonly/>
+              </div>
+                <div class="form-group">
+                    <label asp-for="SubTotal" class="control-label"></label>
+                    <input asp-for="SubTotal" class="form-control"  readonly/>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Total" class="control-label"></label>
+                    <input asp-for="Total" class="form-control"  readonly/>
+                </div>
+
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+       <div class="col-4">
+            <a asp-area="" asp-action="Index" asp-controller="Ventas" style="font-size: 20px" class="gap-3 d-md-flex justify-content-md-end mb-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
+                    <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z" />
+                </svg>
+                volver
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+<script>
+    $(document).ready(function () {
+        // Calcular subtotal y total al cargar la página
+        calculateSubtotalAndTotal();
+
+        // Calcular subtotal y total cuando cambia el campo VentaRapida
+        $("#VentaRapida").change(function () {
+            calculateSubtotalAndTotal();
+        });
+
+        // Calcular subtotal y total cuando cambia el campo IdProducto
+        $("#IdProducto").change(function () {
+            calculateSubtotalAndTotal();
+        });
+
+        // Función para calcular el subtotal y total
+        function calculateSubtotalAndTotal() {
+            var ventaRapida = $("#VentaRapida").val();
+            var idProducto = $("#IdProducto").val();
+
+            // Realizar la petición al servidor para calcular los valores
+            $.ajax({
+                url: "/Ventas/CalculateSubtotalAndTotal",
+                type: "GET",
+                data: { ventaRapida: ventaRapida, idProducto: idProducto },
+                success: function (data) {
+                    $("#SubTotal").val(data.subtotal.toFixed(2));
+                    $("#Total").val(data.total.toFixed(2));
+                },
+                error: function () {
+                    alert("Error al calcular el subtotal y total.");
+                }
+            });
+        }
+    });
+</script>
